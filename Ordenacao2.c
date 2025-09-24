@@ -4,8 +4,12 @@
 
 void imprimirVetor(int *arr, int t);
 void trocar(int *a, int *b);
+
 void mergeSort(int *arr, int beg, int end);
 void merge(int *arr, int beg, int mid, int end);
+
+void quickSort(int *arr, int inicio, int fim);
+int particiona(int *arr, int inicio, int fim);
 
 int main() {
 
@@ -18,6 +22,28 @@ int main() {
   imprimirVetor(vetor, tamanho);
 
   return 0;
+}
+
+void quickSort(int *arr, int inicio, int fim) {
+    int pivo;
+    
+    if(fim>inicio) {
+        pivo = particiona(arr, inicio, fim);
+        quickSort(arr, inicio, pivo - 1);
+        quickSort(arr, pivo + 1, fim);
+    }
+}
+
+int particiona(int *arr, int inicio, int fim) {
+    int esq = inicio, dir = fim, pivo = arr[inicio];
+    while(esq<dir) {
+        while(esq<=fim && arr[esq] <= pivo) esq++;
+        while(dir>=0 && arr[dir] > pivo) dir--;
+        if(esq<dir) trocar(&arr[esq], &arr[dir]);
+    }
+    arr[inicio] = arr[dir];
+    arr[dir] = pivo;
+    return dir;
 }
 
 void mergeSort(int *arr, int beg, int end) {
