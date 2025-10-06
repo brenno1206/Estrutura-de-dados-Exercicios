@@ -1,0 +1,44 @@
+#include <stdio.h>
+#include <stdlib.h>
+
+typedef struct cel {
+  int conteudo;
+  struct cel *seg;
+} cel;
+
+typedef struct cel* Lista;
+
+Lista* criaLista() {
+  Lista *li = (Lista *) malloc(sizeof(Lista));
+  if(li != NULL) {
+    *li = NULL;
+  }
+  return li;
+}
+
+int main()
+{
+  Lista *lst;
+  lst = criaLista();
+  
+  if(!(lst != NULL && *lst == NULL)) return 1;
+  
+  cel n1;
+  cel n2;
+  cel n3;
+  n1.conteudo = 20;
+  n2.conteudo = 25;
+  n3.conteudo = 32;
+  n1.seg = &n2;
+  n2.seg = &n3;
+  n3.seg = NULL;
+  
+  *lst = &n1;
+  
+  cel *aux = *lst;
+  while(aux != NULL) {
+    printf("\t%d ", aux->conteudo);
+    aux = aux->seg;
+  }
+	return 0;
+}
