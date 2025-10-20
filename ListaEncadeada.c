@@ -1,115 +1,160 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-// fazer com cabeça, duplamente encadeada e circular
-
-typedef struct cel {
+typedef struct cel
+{
+	struct cel *anterior;
 	int conteudo;
-	struct cel *seg;
+	struct cel *proximo;
 } cel;
 
-typedef struct cel* Lista;
+typedef struct Lista
+{
+	struct cel *inicio;
+	struct cel *fim;
+	int quantidade;
+} Lista;
 
-Lista* cria_Lista() {
-	Lista *li = (Lista*) malloc(sizeof(Lista));
-	if(li != NULL) {
-		*li = NULL;
-	}
-	return li;
+Lista *criarLista()
+{
+	Lista *lista = (Lista *)malloc(sizeof(Lista));
+	lista->inicio = NULL;
+	lista->fim = NULL;
+	lista->quantidade = 0;
+	return lista;
 }
 
-int insere_lista_fim(Lista* lista, int x) {
-	if (lista == NULL) return 0;
-
-	cel *aux = (cel*) malloc(sizeof(cel));
-	if(aux == NULL) return 0;
-
-	aux->conteudo = x;
-	aux->seg = NULL;
-
-	if(*lista == NULL) {
-		*lista = aux;
-	} else {
-		cel *temp = *lista;
-		while(temp->seg != NULL) {
-			temp = temp->seg;
+void liberarLista(Lista *lista)
+{
+	if (lista != NULL)
+	{
+		while (lista->inicio != NULL)
+		{
+			cel *aux = lista->inicio;
+			lista->inicio = lista->inicio->proximo;
+			free(aux);
 		}
-		temp->seg = aux;
+		free(lista);
 	}
+}
+
+void inserirFim(Lista *lista, int valor)
+{
+	if (lista != NULL)
+	{
+		cel *val = (cel *)malloc(sizeof(cel));
+		val->conteudo = valor;
+		val->proximo = NULL;
+		if (lista->inicio == NULL)
+		{
+			lista->inicio = val;
+			val->anterior = NULL;
+			lista->fim = val;
+		}
+		else
+		{
+			val->anterior = lista->fim;
+			lista->fim->proximo = val;
+			lista->fim = val;
+		}
+		lista->quantidade++;
+	}
+}
+
+void imprimirLista(Lista *lista)
+{
+	for (cel *aux = lista->inicio; aux != NULL; aux = aux->proximo)
+	{
+		printf("%d ", aux->conteudo);
+	}
+	printf("\n");
+}
+
+void inserirInicio(Lista *lista, int valor)
+{
+	if (lista != NULL)
+	{
+		cel *no = (cel *)malloc(sizeof(cel));
+		no->conteudo = valor;
+		no->anterior = NULL;
+
+		if (lista->inicio == NULL)
+		{
+			no->proximo = NULL;
+			lista->inicio = no;
+			lista->fim = no;
+		}
+		else
+		{
+			no->proximo = lista->inicio;
+			lista->inicio->anterior = no;
+			lista->inicio = no;
+		}
+		lista->quantidade++;
+	}
+}
+
+int buscaLinear(Lista *lista, int valor)
+{
+	int i = 0;
+	for (cel *aux = lista->inicio; aux != NULL; aux = aux->proximo, i++)
+	{
+		if (aux->conteudo == valor)
+			return i;
+	}
+	return -1;
+}
+
+int removerElemento(Lista *lista, int valor)
+{
+	if (lista == NULL || lista->inicio == NULL)
+		return 0;
+
+	cel *aux = lista->inicio;
+
+	while (aux != NULL && aux->conteudo != valor)
+	{
+		aux = aux->proximo;
+	}
+	if (aux == NULL)
+		return 0;
+	if (aux == lista->inicio)
+	{
+		lista->inicio = lista->inicio->proximo;
+		if (lista->inicio != NULL)
+			lista->inicio->anterior = NULL;
+	}
+	else if (aux->proximo == NULL)
+	{
+		aux->anterior->proximo = NULL;
+	}
+	else
+	{
+		aux->anterior->proximo = aux->proximo;
+		aux->proximo->anterior = aux->anterior;
+	}
+	free(aux);
 	return 1;
-}
-
-void imprimir_lista(Lista* lista) {
-	if(lista == NULL) {
-		printf("Lista nula.\n");
-	} else if (*lista == NULL) {
-	  printf("Lista Vazia.\n");
-	} else {
-		cel* aux = *lista;
-
-		while(aux != NULL) {
-			printf("%d ", aux->conteudo);
-			aux = aux->seg;
-		}
-		printf("\n");
-	}
-}
-
-int buscaFor(Lista* lista, int x) {
-	if(lista == NULL) return 0;
-	for(cel* aux = *lista; aux != NULL; aux = aux->seg) {
-		if(aux->conteudo == x) return 1;
-	}
-	return 0;
-}
-
-void liberar_lista(Lista* lista) {
-  if (lista != NULL) {
-    cel *aux;
-    while(*lista != NULL) {
-      aux = *lista;
-      *lista = aux->seg;
-      free(aux);
-    }
-    free(lista);
-  }
-}
-
-int remover_lista(Lista* lista, int x) {
-  if (lista == NULL) return 0;
-  if (*lista == NULL) return 0;
-  
-  cel* aux = *lista;
-  cel* ant = NULL;
-  while(aux != NULL && aux->conteudo != x) {
-    ant = aux;
-    aux = aux->seg;
-  }
-  if (aux == NULL) return 0;
-  if (aux == *lista) {
-    *lista = aux->seg;
-  } else {
-    ant->seg = aux->seg;
-  }
-  free(aux);
-  return 1;
-  
 }
 
 int main()
 {
-	Lista *lst = NULL;
-	cel* aux = NULL;
-	lst = cria_Lista();
-	
-	for(int i = 0; i < 10; i++) {
-		insere_lista_fim(lst, i+1);
+	Lista *lista;
+	lista = criarLista();
+	if (lista == NULL)
+		return 1;
+
+	for (int i = 10; i < 20; i++)
+	{
+		inserirFim(lista, i);
+	}
+	for (int i = 9; i >= 0; i--)
+	{
+		inserirInicio(lista, i);
 	}
 
-	
-	imprimir_lista(lst);
-  
-	liberar_lista(lst);
-	
+	imprimirLista(lista);
+	liberarLista(lista);
+
 	return 0;
 }
