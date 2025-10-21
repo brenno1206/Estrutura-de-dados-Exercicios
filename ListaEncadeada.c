@@ -123,10 +123,13 @@ int removerElemento(Lista *lista, int valor)
 		lista->inicio = lista->inicio->proximo;
 		if (lista->inicio != NULL)
 			lista->inicio->anterior = NULL;
+		else
+			lista->fim = NULL;
 	}
 	else if (aux->proximo == NULL)
 	{
 		aux->anterior->proximo = NULL;
+		lista->fim = aux->anterior;
 	}
 	else
 	{
@@ -134,27 +137,128 @@ int removerElemento(Lista *lista, int valor)
 		aux->proximo->anterior = aux->anterior;
 	}
 	free(aux);
+	lista->quantidade--;
 	return 1;
 }
 
+Lista *concatenarLista(Lista *lista1, Lista *lista2)
+{
+	if (lista1 == NULL || lista2 == NULL)
+		return NULL;
+	Lista *listaResultado = criarLista();
+	cel *aux1 = lista1->inicio;
+	cel *aux2 = lista2->inicio;
+
+	while (aux1 != NULL || aux2 != NULL)
+	{
+		if (aux1 != NULL)
+		{
+			inserirFim(listaResultado, aux1->conteudo);
+			aux1 = aux1->proximo;
+		}
+		else if (aux2 != NULL)
+		{
+			inserirFim(listaResultado, aux2->conteudo);
+			aux2 = aux2->proximo;
+		}
+	}
+	return listaResultado;
+}
+
+void concatenarLista(Lista *lista1, Lista *lista2)
+{
+	if (lista1 != NULL && lista2 != NULL && lista2->inicio != NULL)
+	{
+		if (lista1->inicio == NULL)
+		{
+			lista1->inicio = lista2->inicio;
+			lista1->fim = lista2->fim;
+			lista1->quantidade = lista2->quantidade;
+		}
+		else
+		{
+			lista1->fim->proximo = lista2->inicio;
+			lista2->inicio->anterior = lista1->fim;
+			lista1->fim = lista2->fim;
+			lista1->quantidade += lista2->quantidade;
+		}
+		lista2->inicio = NULL;
+		lista2->fim = NULL;
+		lista2->quantidade = 0;
+	}
+}
+
+void removerElementos(Lista *lista, int quantidade)
+{
+	if (lista != NULL || lista->inicio == NULL)
+	{
+		cel *aux;
+		int elementosRemovidos = 0;
+		while (lista->inicio != NULL && elementosRemovidos < quantidade)
+		{
+			aux = lista->inicio;
+			lista->inicio = lista->inicio->proximo;
+
+			free(aux);
+			lista->quantidade--;
+			elementosRemovidos++;
+		}
+		if (aux == NULL)
+			lista->fim = NULL;
+		else
+			lista->inicio->anterior = NULL;
+		if (lista->inicio->proximo == NULL)
+		{
+			lista->fim = lista->inicio;
+		}
+	}
+}
+
+int buscarMaiorElemento(Lista *lista);
+
+int quantidadeDePares(Lista *lista);
+
+int media(Lista *lista);
+
+Lista *copiarSemRepeticao(Lista *lista);
+
+void inverter(Lista *lista);
+
+int *paraVetor(Lista *lista);
+
+int saoIguais(Lista *lista1, Lista *lista2);
+
+int estaContida(Lista *lista1, Lista *lista2);
+
 int main()
 {
-	Lista *lista;
-	lista = criarLista();
-	if (lista == NULL)
-		return 1;
+	Lista *lista1 = criarLista();
+	Lista *lista2 = criarLista();
+	Lista *listaConcatenada;
 
 	for (int i = 10; i < 20; i++)
 	{
-		inserirFim(lista, i);
-	}
-	for (int i = 9; i >= 0; i--)
-	{
-		inserirInicio(lista, i);
+		inserirFim(lista2, i);
 	}
 
-	imprimirLista(lista);
-	liberarLista(lista);
+	for (int i = 9; i >= 0; i--)
+	{
+		inserirInicio(lista1, i);
+	}
+
+	listaConcatenada = concatenarLista(lista1, lista2);
+
+	imprimirLista(lista1);
+	removerElementos(lista1, 7);
+	imprimirLista(lista1);
+	/*
+		imprimirLista(lista1);
+		imprimirLista(lista2);
+		imprimirLista(listaConcatenada);
+	*/
+	liberarLista(lista1);
+	liberarLista(lista2);
+	liberarLista(listaConcatenada);
 
 	return 0;
 }
