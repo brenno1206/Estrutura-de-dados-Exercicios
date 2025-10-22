@@ -1,19 +1,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-typedef struct cel {
-	struct cel* proximo;
+typedef struct cel
+{
+	struct cel *proximo;
 	int conteudo;
 } cel;
 
-typedef struct pilha {
-	cel* inicio;
-	cel* fim;
+typedef struct pilha
+{
+	cel *inicio;
+	cel *fim;
 	int quantidade;
 	int limite;
 } Pilha;
 
-Pilha *criarPilha();
+Pilha *criarPilha(int limite);
 int push(Pilha *pilha, int valor);
 int pop(Pilha *pilha);
 int mostrarTopo(Pilha *pilha);
@@ -29,8 +31,9 @@ int main()
 	printf("Esta cheia: %d\n", isFull(pilha));
 
 	printf("\n\n");
-	for(int i = 0; i < 25; i++) {
-		printf("inserC'C#o do elemento %d: %d\n", i, push(pilha, i));
+	for (int i = 0; i < 25; i++)
+	{
+		printf("inserção do elemento %d: %d\n", i, push(pilha, i));
 	}
 	printf("\n\n");
 	imprimirPilha(pilha);
@@ -50,16 +53,15 @@ int main()
 	printf("Esta vazia: %d\n", isEmpty(pilha));
 	printf("Esta cheia: %d\n", isFull(pilha));
 
-
-
 	liberarPilha(pilha);
 	return 0;
 }
 
-
-Pilha *criarPilha(int limite) {
+Pilha *criarPilha(int limite)
+{
 	Pilha *pilha = malloc(sizeof(pilha));
-	if(pilha != NULL) {
+	if (pilha != NULL)
+	{
 		pilha->inicio = NULL;
 		pilha->fim = NULL;
 		pilha->quantidade = 0;
@@ -68,18 +70,25 @@ Pilha *criarPilha(int limite) {
 	return pilha;
 }
 
-int push(Pilha *pilha, int valor) { //insere no inicio
-	if(pilha == NULL) return -1;
-	if(isFull(pilha)) return 0;
+int push(Pilha *pilha, int valor)
+{ // insere no inicio
+	if (pilha == NULL)
+		return -1;
+	if (isFull(pilha))
+		return 0;
 
-	cel* aux = malloc(sizeof(cel));
-	if(aux == NULL) return -1;
+	cel *aux = malloc(sizeof(cel));
+	if (aux == NULL)
+		return -1;
 
 	aux->proximo = NULL;
 	aux->conteudo = valor;
-	if(isEmpty(pilha)) {
+	if (isEmpty(pilha))
+	{
 		pilha->fim = aux;
-	} else {
+	}
+	else
+	{
 		aux->proximo = pilha->inicio;
 	}
 	pilha->inicio = aux;
@@ -87,12 +96,16 @@ int push(Pilha *pilha, int valor) { //insere no inicio
 	return 1;
 }
 
-int pop(Pilha *pilha) { //retira do inicio
-	if(pilha == NULL) return -1;
-	if(isEmpty(pilha)) return 0;
+int pop(Pilha *pilha)
+{ // retira do inicio
+	if (pilha == NULL)
+		return -1;
+	if (isEmpty(pilha))
+		return 0;
 	cel *aux = pilha->inicio;
 	pilha->inicio = pilha->inicio->proximo;
-	if(pilha->inicio == NULL) {
+	if (pilha->inicio == NULL)
+	{
 		pilha->fim == NULL;
 	}
 	free(aux);
@@ -100,28 +113,38 @@ int pop(Pilha *pilha) { //retira do inicio
 	return 1;
 }
 
-int mostrarTopo(Pilha *pilha) {
-	if(pilha == NULL || isEmpty(pilha)) return -1;
+int mostrarTopo(Pilha *pilha)
+{
+	if (pilha == NULL || isEmpty(pilha))
+		return -1;
 	return pilha->inicio->conteudo;
-
 }
 
-int isEmpty(Pilha *pilha) {
-	if (pilha == NULL) return -1;
-	if(pilha->inicio == NULL) return 1;
+int isEmpty(Pilha *pilha)
+{
+	if (pilha == NULL)
+		return -1;
+	if (pilha->inicio == NULL)
+		return 1;
 	return 0;
 }
 
-int isFull(Pilha *pilha) {
-	if(pilha == NULL) return -1;
-	if(pilha->quantidade == pilha->limite) return 1;
+int isFull(Pilha *pilha)
+{
+	if (pilha == NULL)
+		return -1;
+	if (pilha->quantidade == pilha->limite)
+		return 1;
 	return 0;
 }
 
-void imprimirPilha(Pilha *pilha) {
-	if(pilha != NULL) {
+void imprimirPilha(Pilha *pilha)
+{
+	if (pilha != NULL)
+	{
 		cel *aux = pilha->inicio;
-		while(aux != NULL) {
+		while (aux != NULL)
+		{
 			printf("%d ", aux->conteudo);
 			aux = aux->proximo;
 		}
@@ -129,10 +152,13 @@ void imprimirPilha(Pilha *pilha) {
 	}
 }
 
-void liberarPilha(Pilha *pilha) {
-	if(pilha != NULL) {
+void liberarPilha(Pilha *pilha)
+{
+	if (pilha != NULL)
+	{
 		cel *aux = pilha->inicio;
-		while(aux != NULL) {
+		while (aux != NULL)
+		{
 			cel *temp = aux;
 			aux = aux->proximo;
 			free(temp);
@@ -140,4 +166,3 @@ void liberarPilha(Pilha *pilha) {
 		free(pilha);
 	}
 }
-
