@@ -50,7 +50,13 @@ int totalNosArvBin(ArvBin *raiz) {
 	return 0;
 }
 
-// FAZER ALTURA FUNÇÃO DE ALTURA (MAIOR CAMINHO)
+int alturaArvBin(ArvBin *raiz) {
+    if (raiz == NULL || *raiz == NULL) return -1;
+    int esq = alturaArvBin(&((*raiz)->esq));
+    int dir = alturaArvBin(&((*raiz)->dir));
+    if (esq > dir) return esq + 1;
+    return dir + 1;
+}
 
 int main()
 {
@@ -91,11 +97,12 @@ int main()
 
 	raiz = &converte;
 
-	printf("preOrdem: ");
+	printf(" preOrdem: ");
 	preOrdem(raiz);
-	printf("\nemOrdem:  ");
+	printf("\n emOrdem:  ");
 	emOrdem(raiz);
-	printf("\nposOrdem: ");
+	printf("\n posOrdem: ");
 	posOrdem(raiz);
-	printf("\nQuantidade de nos: %d", totalNosArvBin(raiz));
+	printf("\n Quantidade de nos: %d", totalNosArvBin(raiz));
+	printf("\n Altura da arvore: %d", alturaArvBin(raiz));
 }
