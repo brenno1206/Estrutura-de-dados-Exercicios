@@ -58,18 +58,73 @@ int alturaArvBin(ArvBin *raiz) {
 	return dir + 1;
 }
 
-void inserirElemento(ArvBin *raiz, int valor) {
-	if (raiz == NULL) return;
+int inserirElemento(ArvBin *raiz, int valor) {
+	if (raiz == NULL) return 0;
+	
 	NO* no = (NO*) malloc(sizeof(NO));
+	if (no == NULL) return 0;
 	no->info = valor;
 	no->dir = NULL;
 	no->esq = NULL;
+	
 	if(*raiz == NULL) *raiz = no;
 	else {
-		if((*raiz)->info == valor) return;
-		if(valor < (*raiz)->info) return inserirElemento(&((*raiz)->esq), valor);
-		else return inserirElemento(&((*raiz)->dir), valor);
+	    NO* atual = *raiz;
+	    NO* anterior = NULL;
+	    while(atual != NULL) {
+	        anterior = atual;
+	        if(valor == atual->info) {
+	            free(no);
+	            return 0;
+	        }
+	        if (valor > atual->info) {
+	            atual = atual->dir;
+	        } else {
+	            atual = atual->esq;
+	        }
+	    }
+	    if (valor > anterior->info) anterior->dir = no;
+	    else anterior->esq = no;
 	}
+    return 1;
+}
+
+int inserirElementoRecursivo(ArvBin *raiz, int valor) {
+    if (raiz == NULL) return 0;
+
+    if (*raiz == NULL) {
+        NO* no = (NO*) malloc(sizeof(NO));
+        if (no == NULL) return 0;
+        no->info = valor;
+        no->esq = no->dir = NULL;
+        *raiz = no;
+        return 1;
+    } 
+    else {
+        if (valor < (*raiz)->info)
+            return inserirElementoRecursivo(&((*raiz)->esq), valor);
+        else if (valor > (*raiz)->info)
+            return inserirElementoRecursivo(&((*raiz)->dir), valor);
+        else
+            return 0;
+    }
+}
+
+
+void liberarNo(NO *no) {
+    if (no != NULL) {
+        liberarNo(no->esq);
+        liberarNo(no->dir);
+        free(no);
+        no = NULL;
+    }
+}
+void liberarArvBin(ArvBin *raiz) {
+    if (raiz != NULL) {
+        liberarNo(*raiz);
+        free(raiz);
+        raiz = NULL;
+    }
 }
 
 int buscarElemento(ArvBin *raiz, int valor) {
@@ -83,52 +138,67 @@ int buscarElemento(ArvBin *raiz, int valor) {
 
 }
 
+NO *removerAtual(NO* atual) {
+    NO *no1, *no2;
+    if(atual->esq == NULL) {
+        no2 = atual->dir;
+        free(atual);
+        return no2;
+    }
+    // buscando o nó mais a direita da subárvore da esquerda
+    no1 = atual;
+    no2 = atual->esq;
+    while(no2->dir != NULL) {
+        no1 = no2;
+        no2 = no2->dir;
+    }
+    
+    if(no1 != atual) {
+        no1->dir = no2->esq;
+        no2->esq = atual->dir;
+    }
+    
+    no2->dir = atual->dir;
+    free(atual);
+    return no2;
+}
+
+int removeArvBin(ArvBin *raiz, int valor) {
+    if (raiz == NULL || *raiz == NULL) return 0;
+    NO *anterior = NULL;
+    NO *atual = *raiz;
+    while(atual != NULL) {
+        if (valor == atual->info) {
+            if(atual == *raiz) *raiz = removerAtual(atual);
+            else if (anterior->dir == atual) anterior->dir = removerAtual(atual);
+            else anterior->esq = removerAtual(atual);
+            return 1;
+        }
+        
+        anterior = atual;
+        if (valor > atual->info) atual = atual->dir;
+        else atual = atual->esq;
+    }
+    return 0;
+}
+
 int main()
 {
 	printf("Inicio\n");
 	ArvBin *raiz = cria_ArvBin();
 
+    inserirElemento(raiz, 10);
+    inserirElemento(raiz, 20);
+    inserirElemento(raiz, 30);
+    inserirElemento(raiz, 40);
+    inserirElemento(raiz, 35);
+    inserirElemento(raiz, 25);
+    inserirElemento(raiz, 37);
+    inserirElemento(raiz, 32);
+    inserirElemento(raiz, 31);
+    inserirElemento(raiz, 36);
+    inserirElemento(raiz, 39);
 
-	NO a,b, c, d, e, f, g, h, i;
-	NO *converte = &a;
-
-	a.info = 80;
-	a.esq = &b;
-	a.dir = &c;
-	b.info = 60;
-	b.esq = &d;
-	b.dir = &e;
-	c.info = 90;
-	c.esq = &f;
-	c.dir = &g;
-	d.info = 50;
-	d.esq = NULL;
-	d.dir = NULL;
-	e.info = 70;
-	e.esq = &h;
-	e.dir = NULL;
-	h.info = 65;
-	h.esq = NULL;
-	h.dir = NULL;
-	f.info = 85;
-	f.esq = NULL;
-	f.dir = NULL;
-	g.info = 110;
-	g.esq = &i;
-	g.dir = NULL;
-	i.info = 100;
-	i.esq = NULL;
-	i.dir = NULL;
-
-	raiz = &converte;
-
-	inserirElemento(raiz, 19);
-
-
-	printf("\n 110: %d", buscarElemento(raiz, 110));
-	printf("\n 50: %d", buscarElemento(raiz, 50));
-	printf("\n 2: %d", buscarElemento(raiz, 2));
-	printf("\n 4: %d", buscarElemento(raiz, 4));
 
 	printf("\n preOrdem: ");
 	preOrdem(raiz);
@@ -138,4 +208,8 @@ int main()
 	posOrdem(raiz);
 	printf("\n Quantidade de nos: %d", totalNosArvBin(raiz));
 	printf("\n Altura da arvore: %d", alturaArvBin(raiz));
+	
+	removeArvBin(raiz, 31);
+	printf("\n emOrdem:  ");
+	emOrdem(raiz);
 }
